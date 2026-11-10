@@ -1,0 +1,200 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "57b03f5e-3d52-434c-80db-bdc8cf5d4f6b",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e2f1c0b0-93dc-47ef-9556-16fdf0ed341e",
+      "name": "Webhook",
+      "webhookId": "57b03f5e-3d52-434c-80db-bdc8cf5d4f6b"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "=Eres un analista de operaciones de una aerolínea virtual. Ayudas al responsable de operaciones a interpretar las métricas del negocio: reservas por estado (reserva temporal, pagada, check-in, abordó, expirada, cancelada, pago rechazado, no-show), ingresos por tiquetes pagados, tasa de abordaje, tasa de no-show, canales de check-in (web/app, kiosco, mostrador) y recaudo por exceso de equipaje.\n\nResponde siempre en español, de forma concisa y clara. Usa únicamente los datos que lleguen en el siguiente resumen del dashboard:\n\n{{ $json.body.context }}\n\nSi el resumen está vacío o no tiene la información que te piden, dilo con honestidad y no inventes cifras. Cuando sea útil, sugiere una acción concreta (por ejemplo, contactar reservas por expirar o reforzar kioscos).stant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        0
+      ],
+      "id": "2b59c2ac-3425-4bec-b071-2f084e63c075",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        288,
+        208
+      ],
+      "id": "987a863b-9490-435e-8d09-dd9fc76b9ceb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        192
+      ],
+      "id": "7c2f0651-64f6-47f8-87e6-adbc2b350ece",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2wDWZd7r2OjyJqIf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"response\": {{ JSON.stringify($json.output) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        560,
+        0
+      ],
+      "id": "0254f9f5-75ce-49e3-aa82-0bc3c3a442db",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "emmanuelb.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+            "content-length": "465",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "es-ES,es;q=0.8",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "2800:e2:1380:b59:b546:d268:9ee7:391d",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "CO",
+            "cf-ray": "a582250bcc4b8058-MIA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "http://localhost:5173",
+            "priority": "u=1, i",
+            "referer": "http://localhost:5173/",
+            "sec-ch-ua": "\"Not-A.Brand\";v=\"99\", \"Brave\";v=\"157\", \"Chromium\";v=\"157\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "sec-gpc": "1",
+            "x-forwarded-for": "2800:e2:1380:b59:b546:d268:9ee7:391d, 172.68.12.90",
+            "x-forwarded-host": "emmanuelb.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-swc-34-7c4df75dd9-cbkz4",
+            "x-is-trusted": "yes",
+            "x-real-ip": "2800:e2:1380:b59:b546:d268:9ee7:391d"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": "hola",
+            "sessionId": "sess_1794280262273_7g2yybo",
+            "context": "=== Contexto del Dashboard AeroPulse ===\nFiltros activos: Ruta=\"Todo el sistema\", Fecha=\"Todo\"\nTotal de reservas visibles: 44\nIngresos totales: $12.310.000 COP\nReservas activas (open): 14\nTasa de abordaje: 56.7%\nTiquete promedio: $424.482,759 COP\nReservas por estado: Reserva temporal: 5, Pagada: 5, Check-in: 4, Abordó: 17, Expirada: 4, Cancelada: 3, Pago rechazado: 3, No-show: 3"
+          },
+          "webhookUrl": "https://emmanuelb.app.n8n.cloud/webhook/57b03f5e-3d52-434c-80db-bdc8cf5d4f6b",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "743ec277-7153-4ea1-91e0-2edde87ef5c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5f0d5f46a17a58716e7bd7cca987fb355645603aa3696358ca3f01a441da053"
+  },
+  "nodeGroups": [],
+  "id": "1jCkWuPxyA0NpVTj",
+  "tags": []
+}
